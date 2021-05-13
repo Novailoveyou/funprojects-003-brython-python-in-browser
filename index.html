@@ -17,6 +17,62 @@
 			crossorigin="anonymous"
 		></script>
 
+		<style>
+			* {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+
+			body {
+				font-family: Arial, Helvetica, sans-serif;
+				font-size: 25px;
+				padding: 30px;
+				line-height: 1.6;
+			}
+
+			h1 {
+				text-align: center;
+				margin-bottom: 30px;
+				border-bottom: 1px #ccc solid;
+			}
+
+			h2 {
+				margin-top: 20px;
+			}
+
+			button {
+				cursor: pointer;
+				display: block;
+				background: #333;
+				color: #fff;
+				border: 0;
+				border-radius: 5px;
+				padding: 10px 20px;
+				margin: 20px 0;
+			}
+
+			input[type='text'] {
+				border: 1px #ccc solid;
+				width: 300px;
+				padding: 4px;
+				height: 35px;
+				margin-top: 20px;
+			}
+
+			.card {
+				margin: 20px 0;
+				border: #ccc 1px solid;
+				padding: 20px;
+			}
+
+			.box {
+				background: steelblue;
+				width: 1.6em;
+				height: 1.6em;
+			}
+		</style>
+
 		<title>Brython | Python In The Browser</title>
 	</head>
 	<body onload="brython()">
@@ -36,6 +92,21 @@
 		<input type="file" id="file-upload" />
 		<br />
 		<textarea id="file-text" cols="60" rows="10"></textarea>
+
+		<div class="card">
+			<button id="btn-rotate-cw" style="display: inline">
+				Rotate Clockwise
+			</button>
+			<button id="btn-rotate-ccw" style="display: inline">
+				Rotate Counter clockwise
+			</button>
+			<div id="rotate-box" class="box"></div>
+		</div>
+
+		<h2>Saved Item: <span id="item"></span></h2>
+		<input type="text" id="inpt-item" placeholder="Add to LS" />
+		<button id="btn-add" style="display: inline">Add</button>
+		<button id="btn-remove" style="display: inline">Remove</button>
 
 		<!-- Clg & DOM Insert -->
 		<script type="text/python" id="script0">
@@ -103,6 +174,49 @@
 				reader.bind('load', onload)
 
 			document['file-upload'].bind('input', file_read)
+		</script>
+
+		<!-- Rotate - manipulate style -->
+		<script type="text/python" id="script5">
+			from browser import document, html
+
+			box = document['rotate-box']
+			angle = 0
+
+			def rotateCw(e):
+				global angle
+				angle += 10
+				box.style.transform = f"rotate({angle}deg)"
+
+			def rotateCcw(e):
+				global angle
+				angle -= 10
+				box.style.transform = f"rotate({angle}deg)"
+
+			document['btn-rotate-cw'].bind('click', rotateCw)
+			document['btn-rotate-ccw'].bind('click', rotateCcw)
+		</script>
+
+		<!-- Local storage -->
+		<script type="text/python" id="script6">
+			from browser import document, html, window, console
+
+			storage = window.localStorage
+
+			if storage.getItem('item'):
+				document['item'] <= storage.getItem('item')
+
+			def add_item(e):
+				item = document['inpt-item'].value
+				storage.setItem('item', item)
+				document['item'].textContent = item
+
+			def remove_item(e):
+				storage.removeItem('item')
+				document['item'].textContent = ''
+
+			document['btn-add'].bind('click', add_item)
+			document['btn-remove'].bind('click', remove_item)
 		</script>
 	</body>
 </html>
